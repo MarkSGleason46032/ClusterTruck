@@ -1,0 +1,20 @@
+unit clsItemData;
+
+interface
+ type
+   TItem = class(Tobject)
+     FupcID : string; // since there is leading zeros
+     Fprice : float;
+     FDescription : string;
+     private
+    constructor Create(upcID: string; Price : float; Desription :string);
+    destructor Destroy; override;
+   end;
+implementation
+constructor TItem.Create(upcID: string; Price : float; Desription :string);
+begin
+  FupcID := upcID ;
+  Fprice := Price;
+  FDescription := Desription;
+end;
+end.

@@ -1,0 +1,9 @@
+unit clsConst;
+
+interface
+
+implementation
+ Const
+   MINPORT = 1;
+   MAXPORT = 65535;
+end.

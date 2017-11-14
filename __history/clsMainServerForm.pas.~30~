@@ -1,0 +1,150 @@
+unit clsMainServerForm;
+
+interface
+
+uses
+  Winapi.Windows, Winapi.Messages, System.SysUtils, System.Variants, System.Classes, Vcl.Graphics,
+  Vcl.Controls, Vcl.Forms, Vcl.Dialogs, IdContext, IdCustomHTTPServer,
+  IdBaseComponent, IdComponent, IdCustomTCPServer, IdHTTPServer,clsConst,clsMessageStrings,
+  Vcl.StdCtrls;
+
+type
+  TServerForm = class(TForm)
+    HTTPSocketServer: TIdHTTPServer;
+    Label1: TLabel;
+    HttpPort: TEdit;
+    Button1: TButton;
+    Memo1: TMemo;
+    procedure HTTPSocketServerCommandGet(AContext: TIdContext;
+      ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo);
+    procedure Button1Click(Sender: TObject);
+    procedure HTTPSocketServerStatus(ASender: TObject; const AStatus: TIdStatus;
+      const AStatusText: string);
+    procedure HttpPortChange(Sender: TObject);
+    procedure FormCreate(Sender: TObject);
+    procedure FormDestroy(Sender: TObject);
+  private
+    { Private declarations }
+    FBalloonHint : TBalloonHint;
+    procedure WMActivateApp(var AMessage: TMessage); message WM_ActivateApp;
+    procedure WMWindowPosChanged(var AMessage: TMessage);  message WM_WindowPosChanged;
+    function ValidatePortNumber(AStr : string; var Value : integer) : boolean;
+    function ValidateAPIKEYandUPC(apiKey : string; upc : string) : string;
+  public
+    { Public declarations }
+  end;
+
+var
+  ServerForm: TServerForm;
+
+implementation
+
+{$R *.dfm}
+function TServerForm.ValidatePortNumber(AStr : string; var Value : integer) : boolean;
+begin
+  result := TryStrToInt(AStr, Value) and (Value >= MINPORT) and (Value <= MAXPORT);
+end;
+function TServerForm.ValidateAPIKEYandUPC(apiKey : string; upc : string ): string;
+begin
+  result := '';
+  if (apiKey = VALID_API_KEY ) then
+  begin
+    // validapikey
+    result := format(ReturnMessage,['33.33','lllll']);
+  end
+  else
+    result := InvalidApiKey;
+end;
+procedure TServerForm.Button1Click(Sender: TObject);
+
+begin
+  HTTPSocketServer.DefaultPort := StrToInt(HttpPort.Text);
+  try
+    HTTPSocketServer.Active := true;
+  except
+    on E: Exception do
+      Memo1.Lines.Add(Format(ErrMsg,[e.Message]));
+
+  end;
+
+end;
+
+procedure TServerForm.FormCreate(Sender: TObject);
+begin
+  FBalloonHint := TBalloonHint.Create(Self);
+  FBalloonHint.HideAfter := 2000;
+  FBalloonHint.Delay := 0;
+end;
+
+procedure TServerForm.FormDestroy(Sender: TObject);
+begin
+  FBalloonHint.Free;
+end;
+
+procedure TServerForm.HttpPortChange(Sender: TObject);
+var
+  Value : integer;
+  R: TRect;
+begin
+
+ if Not ValidatePortNumber(HttpPort.Text,Value) then
+ begin
+   FBalloonHint.Description := Format( ValidPortMessge, [IntToStr(MINPORT),IntToStr(MAXPORT)]);
+   R := HttpPort.BoundsRect;
+   R.TopLeft := ClientToScreen(R.TopLeft);
+   R.BottomRight := ClientToScreen(R.BottomRight);
+   FBalloonHint.ShowHint(R);
+ end;
+end;
+
+procedure TServerForm.HTTPSocketServerCommandGet(AContext: TIdContext;
+  ARequestInfo: TIdHTTPRequestInfo; AResponseInfo: TIdHTTPResponseInfo);
+
+var
+  i : integer;
+  apiKey : string;
+  upc : string;
+begin
+  if UpperCase(ARequestInfo.Command) =  VALID_COMMAND then
+  begin
+    //So far so good
+    //lets valid tje params that got passed in we need a apiKey and a UPC
+    if ARequestInfo.Params.Count >= 2 then
+    begin
+      if (ARequestInfo.Params.IndexOfName(VALID_API_KEY_STR) > -1 ) and
+         (ARequestInfo.Params.IndexOfName(VALID_UPC_STR) > -1 ) then
+      begin
+        apiKey := ARequestInfo.Params.ValueFromIndex[ARequestInfo.Params.IndexOfName(VALID_API_KEY_STR)];
+        upc := ARequestInfo.Params.ValueFromIndex[ARequestInfo.Params.IndexOfName(VALID_UPC_STR)];
+        //lets vaild the apiKey insure
+
+        AResponseInfo.ContentText := ValidateAPIKEYandUPC(apiKey,upc);
+      end
+      else
+        AResponseInfo.ContentText := WrongParamsName ;
+    end
+    else
+      AResponseInfo.ContentText := WrongParamsCount ;
+  end
+  else
+    AResponseInfo.ContentText := format(InvalidCommandType,[ARequestInfo.Command]);
+
+end;
+
+procedure TServerForm.HTTPSocketServerStatus(ASender: TObject;
+  const AStatus: TIdStatus; const AStatusText: string);
+begin
+  Memo1.Lines.Add (AStatusText);
+end;
+procedure TServerForm.WMActivateApp(var AMessage: TMessage);
+begin
+  if Assigned(FBalloonHint) then FBalloonHint.HideHint;
+  inherited;
+end;
+
+procedure TServerForm.WMWindowPosChanged(var AMessage: TMessage);
+begin
+  if Assigned(FBalloonHint) then FBalloonHint.HideHint;
+  inherited;
+end;
+end.

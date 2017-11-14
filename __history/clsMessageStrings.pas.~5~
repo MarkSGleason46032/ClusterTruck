@@ -1,0 +1,10 @@
+unit clsMessageStrings;
+
+interface
+
+const
+   ReturnMessage = '[$%s] %s';
+   ErrMsg = 'Failed to start server Error Message = %s'
+implementation
+
+end.

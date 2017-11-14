@@ -1,0 +1,9 @@
+unit clsMessageStrings;
+
+interface
+
+const
+   ReturnMessage = '[$%s] %s';
+implementation
+
+end.

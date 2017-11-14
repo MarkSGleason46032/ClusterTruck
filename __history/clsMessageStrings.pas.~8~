@@ -1,0 +1,12 @@
+unit clsMessageStrings;
+
+interface
+
+const
+   ReturnMessage = '[$%s] %s';
+   ErrMsg = 'Failed to start server Error Message = %s';
+   ValidPortMessge = 'Port must be between %s and %s';
+   InvalidCommandType ='Server only supports GET commands you sent a %s ';
+implementation
+
+end.

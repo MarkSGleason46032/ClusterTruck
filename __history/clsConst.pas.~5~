@@ -1,0 +1,13 @@
+unit clsConst;
+
+interface
+
+Const
+   MINPORT = 1;
+   MAXPORT = 65535;
+   VALID_API_KEY = 028400003001;
+   VALID_COMMAND = 'GET'
+
+implementation
+
+end.

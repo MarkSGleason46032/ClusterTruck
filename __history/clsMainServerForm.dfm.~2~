@@ -1,0 +1,40 @@
+object ServerForm: TServerForm
+  Left = 0
+  Top = 0
+  Caption = 'ServerForm'
+  ClientHeight = 242
+  ClientWidth = 527
+  Color = clBtnFace
+  Font.Charset = DEFAULT_CHARSET
+  Font.Color = clWindowText
+  Font.Height = -11
+  Font.Name = 'Tahoma'
+  Font.Style = []
+  OldCreateOrder = False
+  PixelsPerInch = 96
+  TextHeight = 13
+  object Label1: TLabel
+    Left = 8
+    Top = 8
+    Width = 68
+    Height = 13
+    Caption = 'Listen On Port'
+  end
+  object Edit1: TEdit
+    Left = 82
+    Top = 5
+    Width = 121
+    Height = 21
+    TabOrder = 0
+    Text = '3000'
+    OnKeyPress = Edit1KeyPress
+  end
+  object IdHTTPServer1: TIdHTTPServer
+    Active = True
+    Bindings = <>
+    DefaultPort = 3333
+    OnCommandGet = IdHTTPServer1CommandGet
+    Left = 480
+    Top = 8
+  end
+end

@@ -1,0 +1,21 @@
+unit clsItemData;
+
+interface
+uses
+  Windows, messages, classes, SysUtils, SyncObjs;
+ type
+   TItem = class(Tobject)
+     FupcID : string; // since there is leading zeros
+     Fprice : double;
+     FDescription : string;
+     private
+       constructor Create(upcID: string; Price : double; Desription :string);
+   end;
+implementation
+constructor TItem.Create(upcID: string; Price : double; Desription :string);
+begin
+  FupcID := upcID ;
+  Fprice := Price;
+  FDescription := Desription;
+end;
+end.
